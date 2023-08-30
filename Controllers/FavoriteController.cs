@@ -25,7 +25,7 @@ public class FavoriteController : ControllerBase
             List<Favorite> favoriteList = GetFavorites(request.Email);
             return Ok(favoriteList);
         }
-        return BadRequest("Couldn't add favorite movie");
+        return NotFound("Couldn't add favorite movie");
 
 
     }
@@ -58,7 +58,8 @@ public class FavoriteController : ControllerBase
             DbContext.SaveChanges();
             return Ok("Favorite movie removed");
         }
-        return BadRequest("Couldn't remove favorite movie");
+        var errorResponse = new { ErrorMessage = "Couldn't remove favorite movie" };
+        return NotFound(errorResponse);
     }
 
     private static List<Favorite> GetFavorites(string Email)

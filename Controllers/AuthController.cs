@@ -3,8 +3,6 @@ using System.Security.Cryptography;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
-using C__Movies_App_Api.Data;
-using Azure;
 
 namespace C__Movies_App_Api.Controllers;
 
@@ -25,31 +23,41 @@ public class AuthController : ControllerBase
     [HttpPost("register")]
     public async Task<ActionResult<User>> Register(UserDto request)
     {
-        CreatePasswordHash(request.Password, out byte[] passwordHash, out byte[] passwordSalt);
+        using var DbContext = new DataContext();
+        user = DbContext.Users.FirstOrDefault(user => user.Email == request.Email);
+        if (user != null)
+        {
+            var errorResponse = new { ErrorMessage = "Email already exists" };
+            return NotFound(errorResponse);
+        }
 
+        CreatePasswordHash(request.Password, out byte[] passwordHash, out byte[] passwordSalt);
         user.Username = request.Username;
         user.Email = request.Email;
         user.PasswordHash = passwordHash;
         user.PasswordSalt = passwordSalt;
         InsertUser(user);
-
         return Ok(user);
+
+
     }
 
 
     [HttpPost("login")]
 
-    public async Task<ActionResult<User>> Login(UserDto request)
+    public async Task<ActionResult<User>> Login(UserLogin request)
     {
         using var dbContext = new DataContext();
         user = dbContext.Users.FirstOrDefault(user => user.Email == request.Email);
         if (user == null)
         {
-            return BadRequest("Email not found");
+            var errorResponse = new { ErrorMessage = "Email not found" };
+            return NotFound(errorResponse);
         }
         if (!VerifyPasswordHash(request.Password, user.PasswordHash, user.PasswordSalt))
         {
-            return BadRequest("Password Invalid");
+            var errorResponse = new { ErrorMessage = "Incorrect Password" };
+            return NotFound(errorResponse);
         }
 
         string token = CreateToken(user);
