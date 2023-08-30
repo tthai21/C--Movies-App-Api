@@ -1,10 +1,9 @@
-using System.Reflection.Metadata.Ecma335;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.Extensions.Configuration;
 using System.IdentityModel.Tokens.Jwt;
+using C__Movies_App_Api.Data;
 
 namespace C__Movies_App_Api.Controllers;
 
@@ -29,6 +28,7 @@ public class AuthController : ControllerBase
         user.Email = request.Email;
         user.PasswordHash = passwordHash;
         user.PasswordSalt = passwordSalt;
+        InsertUser(user);
 
         return Ok(user);
     }
@@ -93,4 +93,13 @@ public class AuthController : ControllerBase
 
         }
     }
+
+    private static void InsertUser(User user)
+    {
+        using var dbContext = new DataContext();
+        dbContext.Users.Add(user);
+        dbContext.SaveChanges();
+
+    }
+
 }
