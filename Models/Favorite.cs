@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
 
 namespace C__Movies_App_Api
 {
@@ -8,8 +9,11 @@ namespace C__Movies_App_Api
         [Key]
         public int Id { get; set; }
         public string MovieLink { get; set; } = string.Empty;
+
         public string Email { get; set; } = string.Empty;
 
-        // public virtual User User { get; set; }
+        [ForeignKey("User")]
+        public int UserId { get; set; }
+
     }
 }

@@ -35,6 +35,9 @@ namespace C__Movies_App_Api.Migrations
                     b.Property<string>("MovieLink")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.ToTable("Favorites");

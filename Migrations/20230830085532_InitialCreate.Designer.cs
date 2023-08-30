@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace C__Movies_App_Api.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20230830071340_InitialCreate")]
+    [Migration("20230830085532_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -37,6 +37,9 @@ namespace C__Movies_App_Api.Migrations
 
                     b.Property<string>("MovieLink")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 

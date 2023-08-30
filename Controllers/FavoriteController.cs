@@ -13,10 +13,11 @@ public class FavoriteController : ControllerBase
     [HttpPost("addFavorite")]
     public async Task<ActionResult<List<Favorite>>> Favorite(FavoriteDto request)
     {
-
+        using var DbContext = new DataContext();
         favorite.Email = request.Email;
         favorite.MovieLink = request.MovieLink;
-        using var DbContext = new DataContext();
+        user = DbContext.Users.FirstOrDefault(user => user.Email == request.Email);
+        favorite.UserId = user.UserId;
         var exited = DbContext.Favorites.FirstOrDefault(f => f.MovieLink == favorite.MovieLink && f.Email == favorite.Email);
         if (exited == null)
         {
@@ -40,9 +41,24 @@ public class FavoriteController : ControllerBase
         DbContext.Favorites.Add(new Favorite()
         {
             MovieLink = favorite.MovieLink,
-            Email = favorite.Email
+            Email = favorite.Email,
+            UserId = favorite.UserId
         });
         DbContext.SaveChanges();
+    }
+
+    [HttpPost("removeFavorite")]
+    public async Task<ActionResult<string>> removeFavorites(FavoriteDto favorite)
+    {
+        using var DbContext = new DataContext();
+        var exitedFavorite = DbContext.Favorites.FirstOrDefault(f => f.Email == favorite.Email && f.MovieLink == favorite.MovieLink);
+        if (exitedFavorite != null)
+        {
+            DbContext.Favorites.Remove(exitedFavorite);
+            DbContext.SaveChanges();
+            return Ok("Favorite movie removed");
+        }
+        return BadRequest("Couldn't remove favorite movie");
     }
 
     private static List<Favorite> GetFavorites(string Email)
