@@ -16,9 +16,17 @@ public class FavoriteController : ControllerBase
 
         favorite.Email = request.Email;
         favorite.MovieLink = request.MovieLink;
-        AddFavorite(favorite);
-        var favoriteList = GetFavorites(request.Email);
-        return Ok(favoriteList);
+        using var DbContext = new DataContext();
+        var exited = DbContext.Favorites.FirstOrDefault(f => f.MovieLink == favorite.MovieLink && f.Email == favorite.Email);
+        if (exited == null)
+        {
+            AddFavorite(favorite);
+            List<Favorite> favoriteList = GetFavorites(request.Email);
+            return Ok(favoriteList);
+        }
+        return BadRequest("Couldn't add favorite movie");
+
+
     }
 
     private Task AddFavorite(FavoriteDto favorite)
@@ -42,5 +50,6 @@ public class FavoriteController : ControllerBase
         using var DbContext = new DataContext();
         return DbContext.Favorites.Where(favorite => favorite.Email == Email).ToList();
     }
+
 
 }

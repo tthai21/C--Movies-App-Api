@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using C__Movies_App_Api.Data;
+using Azure;
 
 namespace C__Movies_App_Api.Controllers;
 
@@ -12,6 +13,8 @@ namespace C__Movies_App_Api.Controllers;
 public class AuthController : ControllerBase
 {
     public static User user = new User();
+    public static Favorite favorite = new Favorite();
+
     private IConfiguration _configuration;
 
     public AuthController(IConfiguration configuration)
@@ -36,9 +39,11 @@ public class AuthController : ControllerBase
 
     [HttpPost("login")]
 
-    public async Task<ActionResult<string>> Login(UserDto request)
+    public async Task<ActionResult<User>> Login(UserDto request)
     {
-        if (user.Email != request.Email)
+        using var dbContext = new DataContext();
+        user = dbContext.Users.FirstOrDefault(user => user.Email == request.Email);
+        if (user == null)
         {
             return BadRequest("Email not found");
         }
@@ -48,9 +53,17 @@ public class AuthController : ControllerBase
         }
 
         string token = CreateToken(user);
+        var favoriteList = dbContext.Favorites.Where(f => f.Email == request.Email).ToList();
 
-        return Ok(token);
+        var respond = new RespondList
+        {
+            token = token,
+            favoriteList = favoriteList
+        };
+
+        return Ok(respond);
     }
+
 
     private string CreateToken(User user)
     {
