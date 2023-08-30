@@ -11,8 +11,8 @@ namespace C__Movies_App_Api
         public byte[] PasswordHash { get; set; }
         public byte[] PasswordSalt { get; set; }
 
-        public List<Favorite> Favorites { get; set; }
-        public List<Recent> Recents { get; set; }
+        // public List<Favorite> Favorites { get; set; }
+        
 
     }
 }

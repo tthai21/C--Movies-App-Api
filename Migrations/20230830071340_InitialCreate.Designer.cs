@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace C__Movies_App_Api.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20230829173650_InitialCreate")]
+    [Migration("20230830071340_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -32,38 +32,15 @@ namespace C__Movies_App_Api.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("Email")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("MovieLink")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("Favorites");
-                });
-
-            modelBuilder.Entity("C__Movies_App_Api.Recent", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("MovieLink")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Recents");
                 });
 
             modelBuilder.Entity("C__Movies_App_Api.User", b =>
@@ -89,31 +66,6 @@ namespace C__Movies_App_Api.Migrations
                     b.HasKey("UserId");
 
                     b.ToTable("Users");
-                });
-
-            modelBuilder.Entity("C__Movies_App_Api.Favorite", b =>
-                {
-                    b.HasOne("C__Movies_App_Api.User", null)
-                        .WithMany("Favorites")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("C__Movies_App_Api.Recent", b =>
-                {
-                    b.HasOne("C__Movies_App_Api.User", null)
-                        .WithMany("Recents")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("C__Movies_App_Api.User", b =>
-                {
-                    b.Navigation("Favorites");
-
-                    b.Navigation("Recents");
                 });
 #pragma warning restore 612, 618
         }
