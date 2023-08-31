@@ -24,13 +24,12 @@ public class AuthController : ControllerBase
     public async Task<ActionResult<User>> Register(UserDto request)
     {
         using var DbContext = new DataContext();
-        user = DbContext.Users.FirstOrDefault(user => user.Email == request.Email);
-        if (user != null)
+        bool exitedUser = DbContext.Users.Any(user => user.Email == request.Email);
+        if (exitedUser == true)
         {
             var errorResponse = new { ErrorMessage = "Email already exists" };
             return NotFound(errorResponse);
         }
-
         CreatePasswordHash(request.Password, out byte[] passwordHash, out byte[] passwordSalt);
         user.Username = request.Username;
         user.Email = request.Email;
@@ -78,19 +77,21 @@ public class AuthController : ControllerBase
 
         List<Claim> claims = new List<Claim>()
         {
-            new Claim(ClaimTypes.Name, user.Username),
-            new Claim(ClaimTypes.Email, user.Email),
+            new Claim("username", user.Username),
+            new Claim("email", user.Email),
         };
 
         var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(_configuration.GetSection("AppSettings:Token").Value));
-
+        var tokenHandler = new JwtSecurityTokenHandler();
         var cred = new SigningCredentials(key, SecurityAlgorithms.HmacSha256Signature);
 
-        var token = new JwtSecurityToken(
-            claims: claims,
-            expires: DateTime.Now.AddDays(1),
-            signingCredentials: cred
-        );
+        var tokenDescriptor = new SecurityTokenDescriptor
+        {
+            Subject = new ClaimsIdentity(claims),
+            Expires = DateTime.UtcNow.AddDays(7),
+            SigningCredentials = cred
+        };
+        var token = tokenHandler.CreateToken(tokenDescriptor);
 
         var jwt = new JwtSecurityTokenHandler().WriteToken(token);
 
