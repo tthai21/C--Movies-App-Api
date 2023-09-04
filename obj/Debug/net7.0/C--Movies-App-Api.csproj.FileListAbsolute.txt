@@ -74,3 +74,6 @@ C:\Users\user\Desktop\C--Movies-App-Api\bin\Debug\net7.0\Microsoft.EntityFramewo
 C:\Users\user\Desktop\C--Movies-App-Api\bin\Debug\net7.0\Microsoft.Extensions.DependencyModel.dll
 C:\Users\user\Desktop\C--Movies-App-Api\bin\Debug\net7.0\Mono.TextTemplating.dll
 C:\Users\user\Desktop\C--Movies-App-Api\bin\Debug\net7.0\System.CodeDom.dll
+C:\Users\user\Desktop\C--Movies-App-Api\bin\Debug\net7.0\Newtonsoft.Json.dll
+C:\Users\user\Desktop\C--Movies-App-Api\bin\Debug\net7.0\Castle.Core.dll
+C:\Users\user\Desktop\C--Movies-App-Api\bin\Debug\net7.0\Microsoft.EntityFrameworkCore.Proxies.dll

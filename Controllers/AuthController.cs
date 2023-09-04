@@ -60,7 +60,7 @@ public class AuthController : ControllerBase
         }
 
         string token = CreateToken(user);
-        var favoriteList = dbContext.Favorites.Where(f => f.Email == request.Email).ToList();
+        var favoriteList = dbContext.Favorites.Where(f => f.User.Email == request.Email).ToList();
 
         var respond = new RespondList
         {

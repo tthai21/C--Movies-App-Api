@@ -7,13 +7,16 @@ namespace C__Movies_App_Api
     public class Favorite
     {
         [Key]
-        public int Id { get; set; }
-        public string MovieLink { get; set; } = string.Empty;
-
-        public string Email { get; set; } = string.Empty;
-
-        [ForeignKey("User")]
-        public int UserId { get; set; }
+        public int FavoriteMovieId { get; set; }
+        public int MovieId { get; set; }
+        public string Url { get; set; }
+        public string Title { get; set; }
+        public int Rate { get; set; }
+        public int Year { get; set; }
+        [ForeignKey("UserId")]
+        [Required]
+        public User User { get; set; }
+        public List<Genre> Genres { get; set; }
 
     }
 }
