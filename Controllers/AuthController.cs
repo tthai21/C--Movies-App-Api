@@ -3,6 +3,8 @@ using System.Security.Cryptography;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
+using Microsoft.EntityFrameworkCore;
+
 
 namespace C__Movies_App_Api.Controllers;
 
@@ -11,7 +13,7 @@ namespace C__Movies_App_Api.Controllers;
 public class AuthController : ControllerBase
 {
     public static User user = new User();
-    public static Favorite favorite = new Favorite();
+    // public static Favorite favorite = new Favorite();
 
     private IConfiguration _configuration;
 
@@ -24,21 +26,21 @@ public class AuthController : ControllerBase
     public async Task<ActionResult<User>> Register(UserDto request)
     {
         using var DbContext = new DataContext();
-        bool exitedUser = DbContext.Users.Any(user => user.Email == request.Email);
+        bool exitedUser = await DbContext.Users.AnyAsync(user => user.Email == request.Email);
         if (exitedUser == true)
         {
             var errorResponse = new { ErrorMessage = "Email already exists" };
             return NotFound(errorResponse);
         }
+        var newUser = new User();
         CreatePasswordHash(request.Password, out byte[] passwordHash, out byte[] passwordSalt);
-        user.Username = request.Username;
-        user.Email = request.Email;
-        user.PasswordHash = passwordHash;
-        user.PasswordSalt = passwordSalt;
-        InsertUser(user);
-        return Ok(user);
-
-
+        newUser.Username = request.Username;
+        newUser.Email = request.Email;
+        newUser.PasswordHash = passwordHash;
+        newUser.PasswordSalt = passwordSalt;
+        DbContext.Users.Add(newUser);
+        await DbContext.SaveChangesAsync();
+        return Ok(newUser);
     }
 
 
@@ -60,12 +62,13 @@ public class AuthController : ControllerBase
         }
 
         string token = CreateToken(user);
-        var favoriteList = dbContext.Favorites.Where(f => f.User.Email == request.Email).ToList();
+        //    List<FavoriteRequest> favoriteList = GetFavorites(request.Email);
+
 
         var respond = new RespondList
         {
             token = token,
-            favoriteList = favoriteList
+            // favoriteList = favoriteList
         };
 
         return Ok(respond);
@@ -113,7 +116,6 @@ public class AuthController : ControllerBase
         {
             var computedHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
             return computedHash.SequenceEqual(passwordHash);
-
         }
     }
 

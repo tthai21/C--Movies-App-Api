@@ -11,10 +11,9 @@ namespace C__Movies_App_Api
         public int MovieId { get; set; }
         public string Url { get; set; }
         public string Title { get; set; }
-        public int Rate { get; set; }
+        public float Rate { get; set; }
         public int Year { get; set; }
-        [ForeignKey("UserId")]
-        [Required]
+        // [ForeignKey("UserId")]
         public User User { get; set; }
         public List<Genre> Genres { get; set; }
 

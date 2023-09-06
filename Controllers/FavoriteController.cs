@@ -23,14 +23,14 @@ public class FavoriteController : ControllerBase
             var favorite = new Favorite
             {
                 User = user,
-                MovieId = request.MovieId,
+                MovieId = request.Id,
                 Title = request.Title,
                 Url = request.Url,
                 Rate = request.Rate,
                 Year = request.Year,
                 Genres = new List<Genre>()
             };
-            foreach (var genreData in request.GenreRequest)
+            foreach (var genreData in request.Genres)
             {
                 genre = new Genre { Name = genreData.Name, Id = genreData.Id, Favorite = favorite };
                 favorite.Genres.Add(genre);
@@ -76,19 +76,27 @@ public class FavoriteController : ControllerBase
         return NotFound(errorResponse);
     }
 
-    private static List<FavoriteRequest> GetFavorites(string email)
+    [HttpGet("fetchFavorites")]
+    public async Task<ActionResult<List<Favorite>>> FetchFavorites(string email)
+    {
+        List<FavoriteRequest> favoriteList = GetFavorites(email);
+        return Ok(favoriteList);
+
+    }
+
+    public static List<FavoriteRequest> GetFavorites(string email)
     {
         using var DbContext = new DataContext();
         var favorite = DbContext.Favorites.Where(favorite => favorite.User.Email == email)
         .Include(f => f.Genres)
         .Select(f => new FavoriteRequest
         {
-            MovieId = f.MovieId,
+            Id = f.MovieId,
             Url = f.Url,
             Title = f.Title,
             Rate = f.Rate,
             Year = f.Year,
-            GenreRequest = f.Genres.Select(g => new GenreRequest
+            Genres = f.Genres.Select(g => new GenreRequest
             {
                 Id = g.Id,
                 Name = g.Name
